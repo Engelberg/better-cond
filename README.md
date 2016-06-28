@@ -30,7 +30,7 @@ or alternatively, use it:
 	  (:refer-clojure :exclude [cond])
 	  (:require [better-cond.core :refer [cond]]))
 
-     (b/cond
+     (cond
        (odd? a) 1
        :let [a (quot a 2)]
        (odd? a) 2
