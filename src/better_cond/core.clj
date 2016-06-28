@@ -34,7 +34,7 @@
        :let [a (quot a 2)]
        (odd? a) 2
        3).
-   Also supports :when-let and binding vectors as test expressions." 
+   Also supports :when-let." 
   [& clauses]
   (when-let [[test expr & more-clauses] (seq clauses)]
     (if (next clauses)
@@ -44,9 +44,7 @@
           `(when ~expr (cond ~@more-clauses))
           (if (= :when-let test)
             `(when-let ~expr (cond ~@more-clauses))
-            (if (vector? test)
-              `(if-let ~test ~expr (cond ~@more-clauses))
-              `(if ~test ~expr (cond ~@more-clauses))))))
+            `(if ~test ~expr (cond ~@more-clauses)))))
       test)))
 
 

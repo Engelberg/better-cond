@@ -8,7 +8,7 @@ A variation on cond which sports let bindings and implicit else.
 
 Add the following line to your leiningen dependencies:
 
-	[better-cond "1.0.0"]
+	[better-cond "1.0.1"]
 
 Require better-cond in your namespace header:
 
@@ -19,7 +19,10 @@ Require better-cond in your namespace header:
      (b/cond
        (odd? a) 1
        :let [a (quot a 2)]
-       (odd? a) 2
+       :when-let [x (fn-which-may-return-nil a),
+	              y (fn-which-may-return-nil (* 2 a))]
+	   ; bails early with nil unless x and y are both truthy
+       (odd? (+ x y)) 2
        3)
 ```
 
@@ -30,10 +33,13 @@ or alternatively, use it:
 	  (:refer-clojure :exclude [cond])
 	  (:require [better-cond.core :refer [cond]]))
 
-     (b/cond
+     (cond
        (odd? a) 1
        :let [a (quot a 2)]
-       (odd? a) 2
+       :when-let [x (fn-which-may-return-nil a),
+	              y (fn-which-may-return-nil (* 2 a))]
+	   ; bails early with nil unless x and y are both truthy
+       (odd? (+ x y)) 2
        3)
 ```
 
