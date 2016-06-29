@@ -41,7 +41,7 @@ or alternatively, use it:
        3)
 ```
 
-In order to support multiple bindings in cond's :if-let and :when-let clauses, better-cond.core also contains a version of `if-let` and `when-let` which can take multiple name-expression pairs in the binding vector (the ones built into Clojure can only take a single name and expression).  The test passes only when all the names evaluate to something truthy.  You may find it useful to use better-cond's `if-let` and `when-let` directly.
+In order to support multiple bindings in cond's :when-let clauses, better-cond.core also contains a version of `if-let` and `when-let` which can take multiple name-expression pairs in the binding vector (the ones built into Clojure can only take a single name and expression).  The test passes only when all the names evaluate to something truthy.  You may find it useful to use better-cond's `if-let` and `when-let` directly.
 
 As with `cond`, if you use `if-let` or `when-let` you'll need to qualify with the namespace or namespace alias (i.e., `b/if-let` and `b/when-let`) or you'll need to exclude the Clojure version from your namespace:
 
