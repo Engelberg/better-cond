@@ -102,6 +102,20 @@ in a way that this does not:
 
 Psychologically, these two versions feel totally different because the latter version is simply an *insertion* of a line that lets me refactor and simplify the later lines.  The first way requires me to change the structure of my code, which I am unlikely to do unless I feel it is absolutely necessary.  Also, from a practical standpoint, I can't do the indenting version more than a couple of times before my code gets unwieldy and unreadable because it is so far off to the right side of my screen.
 
+### Inspection matters
+
+Many Clojure programmers use the println debugging method when trying to understand the behavior of their code.  When you want to inspect a value that is flowing through a cond, adding a println statement ordinarily involves significant refactoring, and no one wants to make major changes to their code just to inspect it.  better-cond turns this into a simple matter:
+
+```clojure
+(cond
+  ... some other test/expressions
+  :let [_ (println (:name (:pet customer)))]
+  (> (count pet-name) 20) (need-bigger-plaque)
+  ... tests continue
+```
+
+There is tremendous value in being able to drop a print statement into the middle of a cond so effortlessly.
+
 ### What about threading macros?
 
 My stylistic opinion is that threading macros are best used for short runs of piping the result from one function into another.  It works best when the names of the functions clearly indicate what is being done to the value.  But as the run gets longer, or you are using more general-purpose functions, there are significant benefits from giving names to the intermediate computations.  Some people do this in the form of comments off to the right of each line, explaining what value is being threaded -- I personally prefer to use names that are actually part of the code.
