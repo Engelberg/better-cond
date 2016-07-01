@@ -82,11 +82,11 @@ I know that it will be clearer if I give a name to `(:name (:pet customer))` (an
 ```clojure
 (cond
   ... some other test/expressions
-  (let [pet-name (:name (:pet customer))]
-    (cond
-      (> (count pet-name) 20) (need-bigger-plaque)
-      (= pet-name "Fido") (use-premade-fido-plaque)
-      ... tests continue
+  :else (let [pet-name (:name (:pet customer))]
+          (cond
+            (> (count pet-name) 20) (need-bigger-plaque)
+            (= pet-name "Fido") (use-premade-fido-plaque)
+            ... tests continue
 ```
 
 in a way that this does not:
