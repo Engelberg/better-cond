@@ -124,7 +124,7 @@ Well, certainly one of the beautiful things about Lisp languages is that you can
 
 But there is a social aspect to programming as well. When working as part of a company or as part of the open-source community, there's value to sticking with the standard set of control constructs.  It can be confusing to read someone else's code littered with constructs you don't recognize, or constructs which look like a built-in construct but have special features.  So, certainly I am still hopeful that one day we'll see inclusion of this feature in Clojure.  Although I was not the person who originally proposed  this feature for Clojure, I think it adds a lot of value so I took an active role in helping maintain the patch for the feature request over the years.
 
-For the purposes of the JIRA patch, I've advocated using only the most conservative extension to cond as I think that would be the most realistic proposal for widespread use, i.e.,  just adding the :let clause, no :when-let and no implicit else clause.
+For the purposes of the JIRA patch, I've advocated using only the most conservative extension to cond as I think that would be the most realistic proposal for widespread use and delivering the most "bang for the buck", i.e.,  just adding the :let clause, no :when-let and no implicit else clause.
 
 ## License
 
