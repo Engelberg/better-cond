@@ -110,7 +110,7 @@ Many Clojure programmers use the println debugging method when trying to underst
 (cond
   ... some other test/expressions
   :let [_ (println (:name (:pet customer)))]
-  (> (count pet-name) 20) (need-bigger-plaque)
+  (> (count (:name (:pet customer))) 20) (need-bigger-plaque)
   ... tests continue
 ```
 
