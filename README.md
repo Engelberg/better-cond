@@ -132,7 +132,7 @@ No, a lot of the time you can't name something until it exists, and knowing it e
 
 It's just like the way :let clauses work within a `for` comprehension.
 
-### So since this exists as a library, there's no reason for Clojure to include it, right?
+### Since this exists as a library, there's no reason for Clojure to include it, right?
 
 Well, certainly one of the beautiful things about Lisp languages is that you can code up your own control constructs and use them whether they are officially part of the language or not.  I've been happily using this version of `cond` in my own code for several years.
 
