@@ -140,6 +140,8 @@ But there is a social aspect to programming as well. When working as part of a c
 
 For the purposes of the JIRA patch, I've advocated using only the most conservative extension to cond as I think that would be the most realistic proposal for widespread use and would deliver the most "bang for the buck" (i.e.,  just adding the :let clause, no :when-let and no implicit else clause).
 
+**UPDATE** *The day after the better-cond library was announced, the [JIRA issue](http://dev.clojure.org/jira/browse/CLJ-200) for this enhancement, which had been open for 7 years, was declined, turning off the ability to vote for the feature.  No comment or explanation for declining the patch was provided.*
+
 ## License
 
 Derived from an early version of cgrand/utils, written by Christophe Grand under the Eclipse Public License.
