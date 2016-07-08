@@ -121,7 +121,7 @@ There is tremendous value in being able to drop a print statement into the middl
 I have gotten so used to the power of better-cond to minimize rightward drift, that sometimes I even use it to help the aesthetics of a function that has little to do with cond.  For example:
 
 ```clojure
-defn solutions-general [clauses]
+(defn solutions-general [clauses]
   (cond
     :let [[object->int int->object] (build-transforms clauses)
           transformed-clauses (mapv (clause-transformer object->int) clauses)]
