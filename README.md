@@ -116,6 +116,39 @@ Many Clojure programmers use the println debugging method when trying to underst
 
 There is tremendous value in being able to drop a print statement into the middle of a cond so effortlessly.
 
+### Minimizing rightward drift
+
+I have gotten so used to the power of better-cond to minimize rightward drift, that sometimes I even use it to help the aesthetics of a function that has little to do with cond.  For example:
+
+```clojure
+defn solutions-general [clauses]
+  (cond
+    :let [[object->int int->object] (build-transforms clauses)
+          transformed-clauses (mapv (clause-transformer object->int) clauses)]
+    :when-let [solver (create-solver transformed-clauses)]
+    :let [timeout (.getTimeoutMs solver)]
+    :when-let [solution (.findModel solver timeout)]
+    :let [untransformed-solution ((clause-transformer int->object) solution)]
+    (vec untransformed-solution)))
+```
+
+*Note: In the above example, I've taken advantage of the optional implicit else on the last line of better-cond, which feels especially natural when the second-to-last line is a :let or :when-let.*
+
+Compare with:
+
+```clojure
+(defn solutions-general [clauses]
+  (let [[object->int int->object] (build-transforms clauses)
+        transformed-clauses (mapv (clause-transformer object->int) clauses)]
+    (when-let [solver (create-solver transformed-clauses)]
+      (let [timeout (.getTimeoutMs solver)]
+        (when-let [solution (.findModel solver timeout)]
+          (let [untransformed-solution ((clause-transformer int->object) solution)]
+            (vec untransformed-solution)))))))
+```
+
+It's a matter of taste, of course, whether you want to use cond for a function like this, but I definitely am glad to have a tool in my arsenal to help tame and prevent heavily indented code.
+
 ### What about threading macros?
 
 My stylistic opinion is that threading macros are best used for short runs of piping the result from one function into another.  It works best when the names of the functions clearly indicate what is being done to the value.  But as the run gets longer, or you are using more general-purpose functions, there are significant benefits from giving names to the intermediate computations.  Some people do this in the form of comments off to the right of each line, explaining what value is being threaded -- I personally prefer to use names that are actually part of the code.
