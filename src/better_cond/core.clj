@@ -1,7 +1,7 @@
 (ns better-cond.core
   "A collection of variations on Clojure's core macros. Let's see which features
    end up being useful."
-  {:author "Christophe Grand"}
+  {:author "Christophe Grand and Mark Engelberg"}
   (:refer-clojure :exclude [cond when-let if-let]))
 
 (defmacro if-let
@@ -11,7 +11,7 @@
     `(if-let ~bindings ~then nil))
   ([bindings then else]
     (if (seq bindings)
-      (if (= :let (bindings 0))
+      (if (or (= :let (bindings 0)) (= 'let (bindings 0)))
         `(let ~(bindings 1)
            (if-let ~(subvec bindings 2) ~then ~else))
         `(let [test# ~(bindings 1)]
@@ -34,15 +34,15 @@
        :let [a (quot a 2)]
        (odd? a) 2
        3).
-   Also supports :when-let." 
+   Also supports :when-let. :let and :when-let do not need to be written as keywords." 
   [& clauses]
   (when-let [[test expr & more-clauses] (seq clauses)]
     (if (next clauses)
-      (if (= :let test)
+      (if (or (= :let test) (= 'let test))
         `(let ~expr (cond ~@more-clauses))
-        (if (= :when test)
+        (if (or (= :when test) (= 'when test))
           `(when ~expr (cond ~@more-clauses))
-          (if (= :when-let test)
+          (if (or (= :when-let test) (= 'when-let test))
             `(when-let ~expr (cond ~@more-clauses))
             `(if ~test ~expr (cond ~@more-clauses)))))
       test)))
