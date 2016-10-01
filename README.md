@@ -128,15 +128,15 @@ As with `cond`, if you use `if-let` or `when-let` you'll need to qualify with th
 ```clojure
 	(ns example.core
 	  (:refer-clojure :exclude [cond if-let when-let])
-	  (:require [better-cond.core :refer [cond if-let when-let defnc]]))
+	  (:require [better-cond.core :refer [cond if-let when-let defnc defnc-]]))
 ```
 
-If you want the whole shebang, and you want to replace Clojure's defn with defnc, your namespace header would look like this:
+You could also `:refer :all` if you are on Clojure and not Clojurescript.  If you want the whole shebang, and you want to replace Clojure's defn with defnc, your namespace header would look like this:
 
 ```clojure
 	(ns example.core
-	  (:refer-clojure :exclude [cond if-let when-let defn])
-	  (:require [better-cond.core :refer [cond if-let when-let defnc] :rename {defnc defn}]))
+	  (:refer-clojure :exclude [cond if-let when-let defn defn-])
+	  (:require [better-cond.core :refer [cond if-let when-let defnc defnc-] :rename {defnc defn, defnc- defn-}]))
 ```
 
 I use this library on a daily basis, and it is hugely useful in preventing the code from getting deeply nested, helping to make the code dramatically clearer.  Try it -- you'll be hooked.
