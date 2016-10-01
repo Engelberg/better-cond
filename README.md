@@ -1,6 +1,6 @@
 # better-cond
 
-A variation on cond which sports let bindings, when-let bindings and implicit else.
+A variation on cond which sports let bindings, when-let bindings and implicit else.  The version for Clojure 1.8 and below is version 1.0.1.  If you are using Clojure 1.9, check out [version 2.0.0](https://github.com/Engelberg/better-cond/tree/v2.0.0).
 
 ## Usage
 
