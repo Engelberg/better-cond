@@ -12,7 +12,7 @@ A variation on cond which sports let bindings, when-let bindings, when and impli
 
 ## Usage
 
-Add the following line to your leiningen dependencies:
+Add the following line to your leiningen dependencies (available as SNAPSHOT until Clojure 1.9 is officially released):
 
 	[better-cond "2.0.0-SNAPSHOT"]
 
