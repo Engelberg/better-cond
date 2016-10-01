@@ -11,3 +11,5 @@ pom.xml.asc
 .classpath
 /.lein-*
 /.nrepl-port
+/.idea
+*.iml
