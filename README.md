@@ -128,7 +128,7 @@ As with `cond`, if you use `if-let` or `when-let` you'll need to qualify with th
 ```clojure
 	(ns example.core
 	  (:refer-clojure :exclude [cond if-let when-let])
-	  (:require [better-cond.core :refer [cond if-let when-let]]))
+	  (:require [better-cond.core :refer [cond if-let when-let defnc]]))
 ```
 
 If you want the whole shebang, and you want to replace Clojure's defn with defnc, your namespace header would look like this:
