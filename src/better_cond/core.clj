@@ -83,8 +83,8 @@
   (spec/and
     vector?
     (spec/conformer vec vec)
-    (spec/cat :args (spec/* :clojure.core.specs/binding-form)
-              :varargs (spec/? (spec/cat :amp #{'&} :form :clojure.core.specs/binding-form)))))
+    (spec/cat :args (spec/* ::binding-form)
+              :varargs (spec/? (spec/cat :amp #{'&} :form ::binding-form)))))
 
 (spec/def ::args+body
   (spec/cat :args ::arg-list
@@ -98,6 +98,21 @@
             :bs (spec/alt :arity-1 ::args+body
                           :arity-n (spec/cat :bodies (spec/+ (spec/spec ::args+body))
                                              :attr (spec/? map?)))))
+
+(spec/def ::binding-form
+  (spec/or :sym :clojure.core.specs/local-name
+           :seq ::seq-binding-form
+           :map :clojure.core.specs/map-binding-form))
+
+;; sequential destructuring
+
+(spec/def ::seq-binding-form
+  (spec/and
+    vector?
+    (spec/conformer vec vec)
+    (spec/cat :elems (spec/* ::binding-form)
+              :rest (spec/? (spec/cat :amp #{'&} :form ::binding-form))
+              :as (spec/? (spec/cat :as #{:as} :sym :clojure.core.specs/local-name)))))
 
 (spec/fdef defnc
            :args ::defn-args
