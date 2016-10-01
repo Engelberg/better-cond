@@ -10,18 +10,18 @@
   "A variation on if-let where all the exprs in the bindings vector must be true.
    Also supports :let."
   ([bindings then]
-    `(if-let ~bindings ~then nil))
+   `(if-let ~bindings ~then nil))
   ([bindings then else]
-    (if (seq bindings)
-      (if (or (= :let (bindings 0)) (= 'let (bindings 0)))
-        `(let ~(bindings 1)
-           (if-let ~(subvec bindings 2) ~then ~else))
-        `(let [test# ~(bindings 1)]
-           (if test#
-             (let [~(bindings 0) test#]
-               (if-let ~(subvec bindings 2) ~then ~else))
-             ~else)))
-      then)))
+   (if (seq bindings)
+     (if (or (= :let (bindings 0)) (= 'let (bindings 0)))
+       `(let ~(bindings 1)
+          (if-let ~(subvec bindings 2) ~then ~else))
+       `(let [test# ~(bindings 1)]
+          (if test#
+            (let [~(bindings 0) test#]
+              (if-let ~(subvec bindings 2) ~then ~else))
+            ~else)))
+     then)))
 
 (defmacro when-let
   "A variation on when-let where all the exprs in the bindings vector must be true.
@@ -29,7 +29,7 @@
   [bindings & body]
   `(if-let ~bindings (do ~@body)))
 
-(defmacro cond 
+(defmacro cond
   "A variation on cond which sports let bindings, do and implicit else:
      (cond 
        (odd? a) 1
@@ -38,46 +38,46 @@
        (odd? a) 2
        3).
    Also supports :when-let. 
-   :let, :when-let and :do do not need to be written as keywords." 
+   :let, :when-let and :do do not need to be written as keywords."
   [& clauses]
   (when-let [[test expr & more-clauses] (seq clauses)]
-    (if (next clauses)
-      (if (or (= :do test) (= 'do test))
-        `(do ~expr (cond ~@more-clauses))
-        (if (or (= :let test) (= 'let test))
-          `(let ~expr (cond ~@more-clauses))
-          (if (or (= :when test) (= 'when test))
-            `(when ~expr (cond ~@more-clauses))
-            (if (or (= :when-let test) (= 'when-let test))
-              `(when-let ~expr (cond ~@more-clauses))
-              `(if ~test ~expr (cond ~@more-clauses))))))
-      test)))
+            (if (next clauses)
+              (if (or (= :do test) (= 'do test))
+                `(do ~expr (cond ~@more-clauses))
+                (if (or (= :let test) (= 'let test))
+                  `(let ~expr (cond ~@more-clauses))
+                  (if (or (= :when test) (= 'when test))
+                    `(when ~expr (cond ~@more-clauses))
+                    (if (or (= :when-let test) (= 'when-let test))
+                      `(when-let ~expr (cond ~@more-clauses))
+                      `(if ~test ~expr (cond ~@more-clauses))))))
+              test)))
 
 (defmacro defnc "defn with implicit cond" [& defn-args]
   (cond
     let [conf (spec/conform ::defn-args defn-args),
          bs (:bs conf)]
-    (= (key bs) :arity-1) (cons 'defn (spec/unform ::defn-args
-                                                   (update-in conf [:bs 1 :body] #(list (cons 'cond %)))))
+    (= (key bs) :arity-1) (cons 'clojure.core/defn (spec/unform ::defn-args
+                                                                (update-in conf [:bs 1 :body] #(list (cons 'better-cond.core/cond %)))))
     (= (key bs) :arity-n) (let [bodies (:bodies (val (conf :bs))),
                                 new-bodies
-                                (mapv (fn [body] (update body :body #(list (cons 'cond %))))
+                                (mapv (fn [body] (update body :body #(list (cons 'better-cond.core/cond %))))
                                       bodies)]
-                            (cons 'defn (spec/unform ::defn-args
-                                                     (assoc-in conf [:bs 1 :bodies] new-bodies))))))
+                            (cons 'clojure.core/defn (spec/unform ::defn-args
+                                                                  (assoc-in conf [:bs 1 :bodies] new-bodies))))))
 
 (defmacro defnc- "defn- with implicit cond" [& defn-args]
   (cond
     let [conf (spec/conform ::defn-args defn-args),
          bs (:bs conf)]
-    (= (key bs) :arity-1) (cons 'defn (spec/unform ::defn-args
-                                                   (update-in conf [:bs 1 :body] #(list (cons 'cond %)))))
+    (= (key bs) :arity-1) (cons 'clojure.core/defn (spec/unform ::defn-args
+                                                                (update-in conf [:bs 1 :body] #(list (cons 'better-cond.core/cond %)))))
     (= (key bs) :arity-n) (let [bodies (:bodies (val (conf :bs))),
                                 new-bodies
-                                (mapv (fn [body] (update body :body #(list (cons 'cond %))))
+                                (mapv (fn [body] (update body :body #(list (cons 'better-cond.core/cond %))))
                                       bodies)]
-                            (cons 'defn (spec/unform ::defn-args
-                                                     (assoc-in conf [:bs 1 :bodies] new-bodies))))))
+                            (cons 'clojure.core/defn (spec/unform ::defn-args
+                                                                  (assoc-in conf [:bs 1 :bodies] new-bodies))))))
 
 (spec/def ::arg-list
   (spec/and
