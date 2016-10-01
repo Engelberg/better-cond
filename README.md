@@ -197,7 +197,7 @@ Many Clojure programmers use the println debugging method when trying to underst
 ```clojure
 (cond
   ... some other test/expressions
-  :let [_ (println (:name (:pet customer)))]
+  :do (println (:name (:pet customer)))
   (> (count (:name (:pet customer))) 20) (need-bigger-plaque)
   ... tests continue
 ```
