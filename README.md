@@ -139,7 +139,7 @@ You could also `:refer :all` if you are on Clojure and not Clojurescript.  If yo
 	  (:require [better-cond.core :refer [cond if-let when-let defnc defnc-] :rename {defnc defn, defnc- defn-}]))	  
 ```
 
-(As of the time of this writing, Cursive does not have code completion or adjustable indenting for symbols that have been renamed from other namespaces.)
+(As of the time of this writing, Cursive [does not have code completion or adjustable indenting for symbols that have been renamed from other namespaces](https://github.com/cursive-ide/cursive/issues/1544).)
 
 I use this library on a daily basis, and it is hugely useful in preventing the code from getting deeply nested, helping to make the code dramatically clearer.  Try it -- you'll be hooked.
 
