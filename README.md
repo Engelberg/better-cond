@@ -119,7 +119,7 @@ The only time you wouldn't want to use `defnc` is when you are taking advantage 
   (* x 2))
 ```
 
-I personally tend to write everything with `defnc` now, as it makes it easier to insert let bindings and conditional responses later.
+I personally tend to write everything with `defnc` now, as it makes it easier to insert let bindings and conditional responses later.  `defnc` is implemented using the spec for Clojure's built-in `defn`, so it can handle all the same things: multiple arities, pre/post-map, metadata map, docstring, etc.
 
 In order to support multiple bindings in cond's :when-let clauses, better-cond.core also contains a version of `if-let` and `when-let` which can take multiple name-expression pairs in the binding vector (the ones built into Clojure can only take a single name and expression).  The test passes only when all the names evaluate to something truthy.  You may find it useful to use better-cond's `if-let` and `when-let` directly.
 
