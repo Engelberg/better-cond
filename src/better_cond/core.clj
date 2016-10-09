@@ -89,7 +89,7 @@
 (spec/def ::arg-list
   (spec/and
     vector?
-    (spec/conformer vec arg-list-unformer)
+    (spec/conformer identity arg-list-unformer)
     (spec/cat :args (spec/* ::binding-form)
               :varargs (spec/? (spec/cat :amp #{'&} :form ::binding-form)))))
 
@@ -116,7 +116,7 @@
 (spec/def ::seq-binding-form
   (spec/and
     vector?
-    (spec/conformer vec vec)
+    (spec/conformer identity vec)
     (spec/cat :elems (spec/* ::binding-form)
               :rest (spec/? (spec/cat :amp #{'&} :form ::binding-form))
               :as (spec/? (spec/cat :as #{:as} :sym :clojure.core.specs/local-name)))))
