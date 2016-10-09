@@ -79,10 +79,17 @@
                             (cons 'clojure.core/defn (spec/unform ::defn-args
                                                                   (assoc-in conf [:bs 1 :bodies] new-bodies))))))
 
+
+(defn arg-list-unformer [a]
+  (vec 
+    (if (and (coll? (last a)) (= '& (first (last a))))
+      (concat (drop-last a) (last a))
+      a)))
+
 (spec/def ::arg-list
   (spec/and
     vector?
-    (spec/conformer vec vec)
+    (spec/conformer vec arg-list-unformer)
     (spec/cat :args (spec/* ::binding-form)
               :varargs (spec/? (spec/cat :amp #{'&} :form ::binding-form)))))
 
