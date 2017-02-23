@@ -70,6 +70,8 @@ or alternatively, use it:
        3)
 ```
 
+*Note: better-cond also works in Clojurescript; simply change `:require` to `:require-macros`.*
+
 As of version 2.0.0, writing let, when-let, when, and do as keywords is optional.  So you can also write it like this, if you prefer:
 
 ```clojure
