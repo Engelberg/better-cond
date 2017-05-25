@@ -2,8 +2,8 @@
   "A collection of variations on Clojure's core macros. Let's see which features
    end up being useful."
   {:author "Christophe Grand and Mark Engelberg"}
-  (:require [clojure.core.specs]
-            [clojure.spec :as spec])
+  (:require [clojure.core.specs.alpha]
+            [clojure.spec.alpha :as spec])
   (:refer-clojure :exclude [cond when-let if-let]))
 
 (defmacro if-let
@@ -107,9 +107,9 @@
                                              :attr (spec/? map?)))))
 
 (spec/def ::binding-form
-  (spec/or :sym :clojure.core.specs/local-name
+  (spec/or :sym :clojure.core.specs.alpha/local-name
            :seq ::seq-binding-form
-           :map :clojure.core.specs/map-binding-form))
+           :map :clojure.core.specs.alpha/map-binding-form))
 
 ;; sequential destructuring
 
@@ -119,7 +119,7 @@
     (spec/conformer vec vec)
     (spec/cat :elems (spec/* ::binding-form)
               :rest (spec/? (spec/cat :amp #{'&} :form ::binding-form))
-              :as (spec/? (spec/cat :as #{:as} :sym :clojure.core.specs/local-name)))))
+              :as (spec/? (spec/cat :as #{:as} :sym :clojure.core.specs.alpha/local-name)))))
 
 (spec/fdef defnc
            :args ::defn-args

@@ -1,20 +1,20 @@
 # better-cond
 
-A variation on cond which sports let bindings, when-let bindings, when and implicit else.
+A variation on cond which sports let bindings, when-let bindings, when and implicit else for Clojure and Clojurescript.
 
-*New in version 2.0.0:* 
+*New in version 2.0.1:* 
 
 - Cond supports `do` for a single-line side effect.
 - Cond allows symbols as an alternative to keywords for let, when-let, when, and do.
 - Two new macros: `defnc` and `defnc-` are like `defn` and `defn-` with an implicit cond wrapped around the body.
 
-`better-cond 2.0.0` requires Clojure 1.9 or higher.  If you are still on Clojure 1.8, use `better-cond 1.0.1`
+`better-cond 2.0.1` requires Clojure 1.9 alpha 16 or higher.  If you are still on Clojure 1.8, use `better-cond 1.0.1`
 
 ## Usage
 
 Add the following line to your leiningen dependencies (available as SNAPSHOT until Clojure 1.9 is officially released):
 
-	[better-cond "2.0.0-SNAPSHOT"]
+	[better-cond "2.0.1-SNAPSHOT"]
 
 Require better-cond in your namespace header:
 
