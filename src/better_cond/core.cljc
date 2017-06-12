@@ -2,6 +2,7 @@
   "A collection of variations on Clojure's core macros. Let's see which features
    end up being useful."
   {:author "Christophe Grand and Mark Engelberg"}
+  #?(:cljs (:require-macros [better-cond.core :refer [cond when-let if-let]]))
   (:require [clojure.core.specs.alpha]
             [clojure.spec.alpha :as spec])
   (:refer-clojure :exclude [cond when-let if-let]))
