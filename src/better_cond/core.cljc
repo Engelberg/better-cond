@@ -125,7 +125,3 @@
 (spec/fdef defnc
            :args ::defn-args
            :ret any?)
-
-(spec/fdef clojure.core/defnc
-           :args ::defn-args
-           :ret any?)
