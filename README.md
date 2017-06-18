@@ -70,6 +70,24 @@ or alternatively, use it:
        3)
 ```
 
+In Clojurescript, you need to use `:require-macros`:
+
+```clojure
+	(ns example.core
+	  (:refer-clojure :exclude [cond])
+	  (:require-macros [better-cond.core :refer [cond]]))
+
+     (cond
+       (odd? a) 1       
+       :let [a (quot a 2)]
+       :when-let [x (fn-which-may-return-nil a),
+	              y (fn-which-may-return-nil (* 2 a))]
+	   :when (seq x)
+	   :do (println x)
+       (odd? (+ x y)) 2
+       3)
+```
+
 As of version 2.0.0, writing let, when-let, when, and do as keywords is optional.  So you can also write it like this, if you prefer:
 
 ```clojure
