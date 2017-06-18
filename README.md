@@ -19,77 +19,77 @@ Add the following line to your leiningen dependencies (available as SNAPSHOT unt
 Require better-cond in your namespace header:
 
 ```clojure
-     (ns example.core
-       (:require [better-cond.core :as b]))
+ (ns example.core
+   (:require [better-cond.core :as b]))
 
-     (b/cond
-       (odd? a) 1
+ (b/cond
+   (odd? a) 1
 
-       :let [a (quot a 2)]
-       ; a has been rebound to the result of (quot a 2) for the remainder
-       ; of this cond.
+   :let [a (quot a 2)]
+   ; a has been rebound to the result of (quot a 2) for the remainder
+   ; of this cond.
 
-       :when-let [x (fn-which-may-return-nil a),
-                  y (fn-which-may-return-nil (* 2 a))]
-       ; this when-let binds x and y for the remainder of the cond and
-       ; bails early with nil unless x and y are both truthy
+   :when-let [x (fn-which-may-return-nil a),
+              y (fn-which-may-return-nil (* 2 a))]
+   ; this when-let binds x and y for the remainder of the cond and
+   ; bails early with nil unless x and y are both truthy
 
-       :when (seq x)
-       ; the above when bails early with nil unless (seq x) is truthy
-       ; it could have been written as: (not (seq x)) nil
+   :when (seq x)
+   ; the above when bails early with nil unless (seq x) is truthy
+   ; it could have been written as: (not (seq x)) nil
 
-       :do (println x)
-       ; A great way to put a side-effecting statement, like a println
-       ; into the middle of a cond
+   :do (println x)
+   ; A great way to put a side-effecting statement, like a println
+   ; into the middle of a cond
 
-       (odd? (+ x y)) 2
+   (odd? (+ x y)) 2
 
-       3)
-       ; This version of cond lets you have a single trailing element
-       ; which is treated as a final :else clause.
-       ; Stylistically, I recommend explicitly using :else unless
-       ; the previous line is a :let or :when-let clause, in which
-       ; case the implicit else tends to look more natural.
+   3)
+   ; This version of cond lets you have a single trailing element
+   ; which is treated as a final :else clause.
+   ; Stylistically, I recommend explicitly using :else unless
+   ; the previous line is a :let or :when-let clause, in which
+   ; case the implicit else tends to look more natural.
 ```
 
 or alternatively, use it:
 
 ```clojure
-     (ns example.core
-       (:refer-clojure :exclude [cond])
-       (:require [better-cond.core :refer [cond]]))
+ (ns example.core
+   (:refer-clojure :exclude [cond])
+   (:require [better-cond.core :refer [cond]]))
 
-     (cond
-       (odd? a) 1
-       :let [a (quot a 2)]
-       :when-let [x (fn-which-may-return-nil a),
-                  y (fn-which-may-return-nil (* 2 a))]
-       :when (seq x)
-       :do (println x)
-       (odd? (+ x y)) 2
-       3)
+ (cond
+   (odd? a) 1
+   :let [a (quot a 2)]
+   :when-let [x (fn-which-may-return-nil a),
+              y (fn-which-may-return-nil (* 2 a))]
+   :when (seq x)
+   :do (println x)
+   (odd? (+ x y)) 2
+   3)
 ```
 
-In Clojurescript, you need to use `:require-macros`:
+In Clojurescript, it is best to use `:require-macros`:
 
 ```clojure
-     (ns example.core
-       (:refer-clojure :exclude [cond])
-       (:require-macros [better-cond.core :refer [cond]]))
+ (ns example.core
+   (:refer-clojure :exclude [cond])
+   (:require-macros [better-cond.core :refer [cond]]))
 ```
 
 As of version 2.0.0, writing let, when-let, when, and do as keywords is optional.  So you can also write it like this, if you prefer:
 
 ```clojure
-     (cond
-       (odd? a) 1
-       let [a (quot a 2)]
-       when-let [x (fn-which-may-return-nil a),
-                 y (fn-which-may-return-nil (* 2 a))]
-       when (seq x)
-       do (println x)
-       (odd? (+ x y)) 2
-       3)
+ (cond
+   (odd? a) 1
+   let [a (quot a 2)]
+   when-let [x (fn-which-may-return-nil a),
+             y (fn-which-may-return-nil (* 2 a))]
+   when (seq x)
+   do (println x)
+   (odd? (+ x y)) 2
+   3)
 ```
 
 The `defnc` and `defnc-` macros behave like Clojure's built-in `defn` and `defn-`, but they implicitly wrap the body of the function in `cond`, saving you another level of indenting.
