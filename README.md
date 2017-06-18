@@ -19,8 +19,8 @@ Add the following line to your leiningen dependencies (available as SNAPSHOT unt
 Require better-cond in your namespace header:
 
 ```clojure
-    (ns example.core
-      (:require [better-cond.core :as b]))
+     (ns example.core
+       (:require [better-cond.core :as b]))
 
      (b/cond
        (odd? a) 1
@@ -55,9 +55,9 @@ Require better-cond in your namespace header:
 or alternatively, use it:
 
 ```clojure
-    (ns example.core
-      (:refer-clojure :exclude [cond])
-      (:require [better-cond.core :refer [cond]]))
+     (ns example.core
+       (:refer-clojure :exclude [cond])
+       (:require [better-cond.core :refer [cond]]))
 
      (cond
        (odd? a) 1
@@ -73,12 +73,12 @@ or alternatively, use it:
 In Clojurescript, you need to use `:require-macros`:
 
 ```clojure
-    (ns example.core
-      (:refer-clojure :exclude [cond])
-      (:require-macros [better-cond.core :refer [cond]]))
+     (ns example.core
+       (:refer-clojure :exclude [cond])
+       (:require-macros [better-cond.core :refer [cond]]))
 
      (cond
-       (odd? a) 1       
+       (odd? a) 1
        :let [a (quot a 2)]
        :when-let [x (fn-which-may-return-nil a),
                   y (fn-which-may-return-nil (* 2 a))]
@@ -92,7 +92,7 @@ As of version 2.0.0, writing let, when-let, when, and do as keywords is optional
 
 ```clojure
      (cond
-       (odd? a) 1       
+       (odd? a) 1
        let [a (quot a 2)]
        when-let [x (fn-which-may-return-nil a),
                  y (fn-which-may-return-nil (* 2 a))]
@@ -102,11 +102,11 @@ As of version 2.0.0, writing let, when-let, when, and do as keywords is optional
        3)
 ```
 
-The `defnc` and `defnc-` macros behave like Clojure's built-in `defn` and `defn-`, but they implicitly wrap the body of the function in `cond`, saving you another level of indenting.  
+The `defnc` and `defnc-` macros behave like Clojure's built-in `defn` and `defn-`, but they implicitly wrap the body of the function in `cond`, saving you another level of indenting.
 
 ```clojure
 (defnc f [a]
-  (odd? a) 1       
+  (odd? a) 1
   let [a (quot a 2)]
   when-let [x (fn-which-may-return-nil a),
             y (fn-which-may-return-nil (* 2 a))]
@@ -154,7 +154,7 @@ You could also `:refer :all` if you are on Clojure and not Clojurescript.  If yo
 ```clojure
     (ns example.core
       (:refer-clojure :exclude [cond if-let when-let defn defn-])
-      (:require [better-cond.core :refer [cond if-let when-let defnc defnc-] :rename {defnc defn, defnc- defn-}]))    
+      (:require [better-cond.core :refer [cond if-let when-let defnc defnc-] :rename {defnc defn, defnc- defn-}]))
 ```
 
 (As of the time of this writing, Cursive [does not have code completion or adjustable indenting for symbols that have been renamed from other namespaces](https://github.com/cursive-ide/cursive/issues/1544).)
