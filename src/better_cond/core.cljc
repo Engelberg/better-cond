@@ -124,3 +124,7 @@
 (spec/fdef defnc
            :args ::defn-args
            :ret any?)
+           
+(spec/fdef defnc-
+           :args ::defn-args
+           :ret any?)
