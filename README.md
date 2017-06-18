@@ -2,7 +2,7 @@
 
 A variation on cond which sports let bindings, when-let bindings, when and implicit else for Clojure and Clojurescript.
 
-*New in version 2.0.1:* 
+*New in version 2.0.1:*
 
 - Cond supports `do` for a single-line side effect.
 - Cond allows symbols as an alternative to keywords for let, when-let, when, and do.
@@ -14,58 +14,58 @@ A variation on cond which sports let bindings, when-let bindings, when and impli
 
 Add the following line to your leiningen dependencies (available as SNAPSHOT until Clojure 1.9 is officially released):
 
-	[better-cond "2.0.1-SNAPSHOT"]
+    [better-cond "2.0.1-SNAPSHOT"]
 
 Require better-cond in your namespace header:
 
 ```clojure
-	(ns example.core
-	  (:require [better-cond.core :as b]))
+    (ns example.core
+      (:require [better-cond.core :as b]))
 
      (b/cond
        (odd? a) 1
-       
+
        :let [a (quot a 2)]
        ; a has been rebound to the result of (quot a 2) for the remainder
        ; of this cond.
-       
+
        :when-let [x (fn-which-may-return-nil a),
-	              y (fn-which-may-return-nil (* 2 a))]
-	   ; this when-let binds x and y for the remainder of the cond and
-	   ; bails early with nil unless x and y are both truthy
-	   
-	   :when (seq x)
-	   ; the above when bails early with nil unless (seq x) is truthy
-	   ; it could have been written as: (not (seq x)) nil
-	   
-	   :do (println x)
-	   ; A great way to put a side-effecting statement, like a println
-	   ; into the middle of a cond
-	    
+                  y (fn-which-may-return-nil (* 2 a))]
+       ; this when-let binds x and y for the remainder of the cond and
+       ; bails early with nil unless x and y are both truthy
+
+       :when (seq x)
+       ; the above when bails early with nil unless (seq x) is truthy
+       ; it could have been written as: (not (seq x)) nil
+
+       :do (println x)
+       ; A great way to put a side-effecting statement, like a println
+       ; into the middle of a cond
+
        (odd? (+ x y)) 2
-       
+
        3)
        ; This version of cond lets you have a single trailing element
        ; which is treated as a final :else clause.
        ; Stylistically, I recommend explicitly using :else unless
        ; the previous line is a :let or :when-let clause, in which
-       ; case the implicit else tends to look more natural.       
+       ; case the implicit else tends to look more natural.
 ```
 
 or alternatively, use it:
 
 ```clojure
-	(ns example.core
-	  (:refer-clojure :exclude [cond])
-	  (:require [better-cond.core :refer [cond]]))
+    (ns example.core
+      (:refer-clojure :exclude [cond])
+      (:require [better-cond.core :refer [cond]]))
 
      (cond
-       (odd? a) 1       
+       (odd? a) 1
        :let [a (quot a 2)]
        :when-let [x (fn-which-may-return-nil a),
-	              y (fn-which-may-return-nil (* 2 a))]
-	   :when (seq x)
-	   :do (println x)
+                  y (fn-which-may-return-nil (* 2 a))]
+       :when (seq x)
+       :do (println x)
        (odd? (+ x y)) 2
        3)
 ```
@@ -73,17 +73,17 @@ or alternatively, use it:
 In Clojurescript, you need to use `:require-macros`:
 
 ```clojure
-	(ns example.core
-	  (:refer-clojure :exclude [cond])
-	  (:require-macros [better-cond.core :refer [cond]]))
+    (ns example.core
+      (:refer-clojure :exclude [cond])
+      (:require-macros [better-cond.core :refer [cond]]))
 
      (cond
        (odd? a) 1       
        :let [a (quot a 2)]
        :when-let [x (fn-which-may-return-nil a),
-	              y (fn-which-may-return-nil (* 2 a))]
-	   :when (seq x)
-	   :do (println x)
+                  y (fn-which-may-return-nil (* 2 a))]
+       :when (seq x)
+       :do (println x)
        (odd? (+ x y)) 2
        3)
 ```
@@ -95,9 +95,9 @@ As of version 2.0.0, writing let, when-let, when, and do as keywords is optional
        (odd? a) 1       
        let [a (quot a 2)]
        when-let [x (fn-which-may-return-nil a),
-	             y (fn-which-may-return-nil (* 2 a))]
-	   when (seq x)
-	   do (println x)
+                 y (fn-which-may-return-nil (* 2 a))]
+       when (seq x)
+       do (println x)
        (odd? (+ x y)) 2
        3)
 ```
@@ -144,17 +144,17 @@ In order to support multiple bindings in cond's :when-let clauses, better-cond.c
 As with `cond`, if you use `if-let` or `when-let` you'll need to qualify with the namespace or namespace alias (i.e., `b/if-let` and `b/when-let`) or you'll need to exclude the Clojure version from your namespace:
 
 ```clojure
-	(ns example.core
-	  (:refer-clojure :exclude [cond if-let when-let])
-	  (:require [better-cond.core :refer [cond if-let when-let defnc defnc-]]))
+    (ns example.core
+      (:refer-clojure :exclude [cond if-let when-let])
+      (:require [better-cond.core :refer [cond if-let when-let defnc defnc-]]))
 ```
 
 You could also `:refer :all` if you are on Clojure and not Clojurescript.  If you want the whole shebang, and you want to replace Clojure's defn with defnc, your namespace header would look like this:
 
 ```clojure
-	(ns example.core
-	  (:refer-clojure :exclude [cond if-let when-let defn defn-])
-	  (:require [better-cond.core :refer [cond if-let when-let defnc defnc-] :rename {defnc defn, defnc- defn-}]))	  
+    (ns example.core
+      (:refer-clojure :exclude [cond if-let when-let defn defn-])
+      (:require [better-cond.core :refer [cond if-let when-let defnc defnc-] :rename {defnc defn, defnc- defn-}]))    
 ```
 
 (As of the time of this writing, Cursive [does not have code completion or adjustable indenting for symbols that have been renamed from other namespaces](https://github.com/cursive-ide/cursive/issues/1544).)
