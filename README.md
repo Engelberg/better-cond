@@ -76,16 +76,6 @@ In Clojurescript, you need to use `:require-macros`:
      (ns example.core
        (:refer-clojure :exclude [cond])
        (:require-macros [better-cond.core :refer [cond]]))
-
-     (cond
-       (odd? a) 1
-       :let [a (quot a 2)]
-       :when-let [x (fn-which-may-return-nil a),
-                  y (fn-which-may-return-nil (* 2 a))]
-       :when (seq x)
-       :do (println x)
-       (odd? (+ x y)) 2
-       3)
 ```
 
 As of version 2.0.0, writing let, when-let, when, and do as keywords is optional.  So you can also write it like this, if you prefer:
@@ -117,10 +107,10 @@ The `defnc` and `defnc-` macros behave like Clojure's built-in `defn` and `defn-
 ```
 
 Because this `cond` has an implicit else, you can use `defnc` for almost all functions you would have created with `defn`, even those that do not actually use cond.
-  
+
 ```clojure
 (defnc f [x] (* x 2)) ; This works as expected
-```  
+```
 
 The only time you wouldn't want to use `defnc` is when you are taking advantage of the implicit do offered by `defn`:
 
@@ -129,7 +119,7 @@ The only time you wouldn't want to use `defnc` is when you are taking advantage 
   (println x)
   (* x 2))
 
-; The above makes use of defn's implicit do, but if desired, 
+; The above makes use of defn's implicit do, but if desired,
 ; could be rewritten with defnc as:
 
 (defnc f [x]
