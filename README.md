@@ -6,20 +6,20 @@ A variation on cond which sports let bindings, when-let bindings and implicit el
 
 Add the following line to your leiningen dependencies:
 
-	[better-cond "1.0.1"]
+    [better-cond "1.0.1"]
 
 Require better-cond in your namespace header:
 
 ```clojure
-	(ns example.core
-	  (:require [better-cond.core :as b]))
+     (ns example.core
+       (:require [better-cond.core :as b]))
 
      (b/cond
        (odd? a) 1
        :let [a (quot a 2)]
        :when-let [x (fn-which-may-return-nil a),
-	              y (fn-which-may-return-nil (* 2 a))]
-	   ; bails early with nil unless x and y are both truthy
+                  y (fn-which-may-return-nil (* 2 a))]
+       ; bails early with nil unless x and y are both truthy
        (odd? (+ x y)) 2
        3)
 ```
@@ -27,16 +27,16 @@ Require better-cond in your namespace header:
 or alternatively, use it:
 
 ```clojure
-	(ns example.core
-	  (:refer-clojure :exclude [cond])
-	  (:require [better-cond.core :refer [cond]]))
+     (ns example.core
+       (:refer-clojure :exclude [cond])
+       (:require [better-cond.core :refer [cond]]))
 
      (cond
        (odd? a) 1
        :let [a (quot a 2)]
        :when-let [x (fn-which-may-return-nil a),
-	              y (fn-which-may-return-nil (* 2 a))]
-	   ; bails early with nil unless x and y are both truthy
+                  y (fn-which-may-return-nil (* 2 a))]
+       ; bails early with nil unless x and y are both truthy
        (odd? (+ x y)) 2
        3)
 ```
@@ -46,9 +46,9 @@ In order to support multiple bindings in cond's :when-let clauses, better-cond.c
 As with `cond`, if you use `if-let` or `when-let` you'll need to qualify with the namespace or namespace alias (i.e., `b/if-let` and `b/when-let`) or you'll need to exclude the Clojure version from your namespace:
 
 ```clojure
-	(ns example.core
-	  (:refer-clojure :exclude [cond if-let when-let])
-	  (:require [better-cond.core :refer [cond if-let when-let]]))
+    (ns example.core
+      (:refer-clojure :exclude [cond if-let when-let])
+      (:require [better-cond.core :refer [cond if-let when-let]]))
 ```
 
 The aspect of the library I use the most is the :let binding inside of the cond.  I use this on a daily basis, and it is hugely useful in preventing the code from getting deeply nested and helps make the code dramatically clearer.  Try it -- you'll be hooked.
