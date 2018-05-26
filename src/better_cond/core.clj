@@ -37,21 +37,23 @@
        :let [a (quot a 2)]
        (odd? a) 2
        3).
-   Also supports :let, :when, :when-let, :do and :while, which do not need to be written as keywords."
+   Also supports :let, :when, :when-let, :when-some, :do and :while, which do not need to be written as keywords."
   [& clauses]
   (when-let [[test expr & more-clauses] (seq clauses)]
     (if (next clauses)
-      (if (#{:while 'while} test)
-        `(while ~expr (cond ~@more-clauses))
-        (if (#{:do 'do} test)
-          `(do ~expr (cond ~@more-clauses))
-          (if (#{:let 'let} test)
-            `(let ~expr (cond ~@more-clauses))
-            (if (#{:when 'when} test)
-              `(when ~expr (cond ~@more-clauses))
-              (if (#{:when-let 'when-let} test)
-                `(when-let ~expr (cond ~@more-clauses))
-                `(if ~test ~expr (cond ~@more-clauses)))))))
+      (if (#{:when-some 'when-some} test)
+        `(when-some ~expr (cond ~@more-clauses))
+        (if (#{:while 'while} test)
+          `(while ~expr (cond ~@more-clauses))
+          (if (#{:do 'do} test)
+            `(do ~expr (cond ~@more-clauses))
+            (if (#{:let 'let} test)
+              `(let ~expr (cond ~@more-clauses))
+              (if (#{:when 'when} test)
+                `(when ~expr (cond ~@more-clauses))
+                (if (#{:when-let 'when-let} test)
+                  `(when-let ~expr (cond ~@more-clauses))
+                  `(if ~test ~expr (cond ~@more-clauses))))))))
       test)))
 
 (defmacro defnc "defn with implicit cond" [& defn-args]

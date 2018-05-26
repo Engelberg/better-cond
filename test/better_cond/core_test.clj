@@ -75,4 +75,16 @@
                 :let [b (* @a @a)]
                 :do (swap! proof conj b)
                 (swap! a inc))
-          (is (= @proof [1 4 9 16 25 36 49 64 81])))))))
+          (is (= @proof [1 4 9 16 25 36 49 64 81])))))
+
+    (testing ":when-some"
+      (testing "Passing :when-some clause"
+        (is (= [false false]
+               (cond :let [a [false]]
+                     :when-some [b (some-> a first)]
+                     [b b]))))
+      (testing "Failing :when-some clause"
+        (is (nil?
+             (cond :let [a [nil]]
+                   :when-some [b (some-> a first)]
+                   [b b])))))))
