@@ -41,17 +41,17 @@
    :let, :when-let and :do do not need to be written as keywords."
   [& clauses]
   (when-let [[test expr & more-clauses] (seq clauses)]
-            (if (next clauses)
-              (if (or (= :do test) (= 'do test))
-                `(do ~expr (cond ~@more-clauses))
-                (if (or (= :let test) (= 'let test))
-                  `(let ~expr (cond ~@more-clauses))
-                  (if (or (= :when test) (= 'when test))
-                    `(when ~expr (cond ~@more-clauses))
-                    (if (or (= :when-let test) (= 'when-let test))
-                      `(when-let ~expr (cond ~@more-clauses))
-                      `(if ~test ~expr (cond ~@more-clauses))))))
-              test)))
+    (if (next clauses)
+      (if (or (= :do test) (= 'do test))
+        `(do ~expr (cond ~@more-clauses))
+        (if (or (= :let test) (= 'let test))
+          `(let ~expr (cond ~@more-clauses))
+          (if (or (= :when test) (= 'when test))
+            `(when ~expr (cond ~@more-clauses))
+            (if (or (= :when-let test) (= 'when-let test))
+              `(when-let ~expr (cond ~@more-clauses))
+              `(if ~test ~expr (cond ~@more-clauses))))))
+      test)))
 
 (defmacro defnc "defn with implicit cond" [& defn-args]
   (cond
