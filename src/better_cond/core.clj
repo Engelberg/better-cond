@@ -42,13 +42,13 @@
   [& clauses]
   (when-let [[test expr & more-clauses] (seq clauses)]
     (if (next clauses)
-      (if (or (= :do test) (= 'do test))
+      (if (#{:do 'do} test)
         `(do ~expr (cond ~@more-clauses))
-        (if (or (= :let test) (= 'let test))
+        (if (#{:let 'let} test)
           `(let ~expr (cond ~@more-clauses))
-          (if (or (= :when test) (= 'when test))
+          (if (#{:when 'when} test)
             `(when ~expr (cond ~@more-clauses))
-            (if (or (= :when-let test) (= 'when-let test))
+            (if (#{:when-let 'when-let} test)
               `(when-let ~expr (cond ~@more-clauses))
               `(if ~test ~expr (cond ~@more-clauses))))))
       test)))
