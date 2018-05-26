@@ -5,7 +5,7 @@ A variation on cond which sports let bindings, when-let bindings, when and impli
 *New in version 2.0.1:*
 
 - Cond supports `do` for a single-line side effect.
-- Cond allows symbols as an alternative to keywords for let, when-let, when, and do.
+- Cond allows symbols as an alternative to keywords for let, when-let, when, while and do.
 - Two new macros: `defnc` and `defnc-` are like `defn` and `defn-` with an implicit cond wrapped around the body.
 
 `better-cond 2.0.1` requires Clojure 1.9 alpha 16 or higher.  If you are still on Clojure 1.8, use `better-cond 1.0.1`
@@ -78,7 +78,7 @@ In Clojurescript, it is best to use `:require-macros`:
    (:require-macros [better-cond.core :refer [cond]]))
 ```
 
-As of version 2.0.0, writing let, when-let, when, and do as keywords is optional.  So you can also write it like this, if you prefer:
+As of version 2.0.0, writing let, when-let, when, while and do as keywords is optional.  So you can also write it like this, if you prefer:
 
 ```clojure
  (cond
