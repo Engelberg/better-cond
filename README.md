@@ -1,20 +1,21 @@
 # better-cond
 
-A variation on cond which sports let bindings, when-let bindings, when and implicit else for Clojure and Clojurescript.
+A variation on cond which sports let bindings, when-let bindings, when-some bindings, when, do and implicit else for Clojure and Clojurescript.
 
-*New in version 2.0.1:*
+*New in version 2.0.x:*
 
 - Cond supports `do` for a single-line side effect.
-- Cond allows symbols as an alternative to keywords for let, when-let, when, and do.
+- Cond supports `when-some` (like `when-let` but tests for non-nil).
+- Cond allows symbols as an alternative to keywords for let, when-let, when-some, when, and do.
 - Two new macros: `defnc` and `defnc-` are like `defn` and `defn-` with an implicit cond wrapped around the body.
 
-`better-cond 2.0.1` requires Clojure 1.9 alpha 16 or higher.  If you are still on Clojure 1.8, use `better-cond 1.0.1`
+`better-cond 2.0.2` requires Clojure 1.9 alpha 16 or higher.  If you are still on Clojure 1.8, use `better-cond 1.0.1`.
 
 ## Usage
 
-Add the following line to your leiningen dependencies (available as SNAPSHOT until Clojure 1.9 is officially released):
+Add the following line to your leiningen dependencies:
 
-    [better-cond "2.0.1-SNAPSHOT"]
+    [better-cond "2.0.2"]
 
 Require better-cond in your namespace header:
 
@@ -29,10 +30,15 @@ Require better-cond in your namespace header:
    ; a has been rebound to the result of (quot a 2) for the remainder
    ; of this cond.
 
-   :when-let [x (fn-which-may-return-nil a),
-              y (fn-which-may-return-nil (* 2 a))]
+   :when-let [x (fn-which-may-return-falsey a),
+              y (fn-which-may-return-falsey (* 2 a))]
    ; this when-let binds x and y for the remainder of the cond and
    ; bails early with nil unless x and y are both truthy
+
+   :when-some [b (fn-which-may-return-nil x),
+   			   c (fn-which-may-return-nil y)]
+   ; this when-some binds b and c for the reaminder of the cond and
+   ; bails early with nil unless b and c are both not nil
 
    :when (seq x)
    ; the above when bails early with nil unless (seq x) is truthy
@@ -48,7 +54,7 @@ Require better-cond in your namespace header:
    ; This version of cond lets you have a single trailing element
    ; which is treated as a final :else clause.
    ; Stylistically, I recommend explicitly using :else unless
-   ; the previous line is a :let or :when-let clause, in which
+   ; the previous line is a :let, :when-let, or :when-some clause, in which
    ; case the implicit else tends to look more natural.
 ```
 
@@ -62,8 +68,10 @@ or alternatively, use it:
  (cond
    (odd? a) 1
    :let [a (quot a 2)]
-   :when-let [x (fn-which-may-return-nil a),
-              y (fn-which-may-return-nil (* 2 a))]
+   :when-let [x (fn-which-may-return-falsey a),
+              y (fn-which-may-return-falsey (* 2 a))]
+   :when-some [b (fn-which-may-return-nil x),
+               c (fn-which-may-return-nil y)]
    :when (seq x)
    :do (println x)
    (odd? (+ x y)) 2
@@ -78,14 +86,16 @@ In Clojurescript, it is best to use `:require-macros`:
    (:require-macros [better-cond.core :refer [cond]]))
 ```
 
-As of version 2.0.0, writing let, when-let, when, and do as keywords is optional.  So you can also write it like this, if you prefer:
+As of version 2.0.0, writing let, when-let, when-some, when, and do as keywords is optional.  So you can also write it like this, if you prefer:
 
 ```clojure
  (cond
    (odd? a) 1
    let [a (quot a 2)]
-   when-let [x (fn-which-may-return-nil a),
-             y (fn-which-may-return-nil (* 2 a))]
+   when-let [x (fn-which-may-return-falsey a),
+             y (fn-which-may-return-falsey (* 2 a))]
+   when-some [b (fn-which-may-return-nil x),
+              c (fn-which-may-return-nil y)]
    when (seq x)
    do (println x)
    (odd? (+ x y)) 2
@@ -98,8 +108,10 @@ The `defnc` and `defnc-` macros behave like Clojure's built-in `defn` and `defn-
 (defnc f [a]
   (odd? a) 1
   let [a (quot a 2)]
-  when-let [x (fn-which-may-return-nil a),
-            y (fn-which-may-return-nil (* 2 a))]
+  when-let [x (fn-which-may-return-falsey a),
+            y (fn-which-may-return-falsey (* 2 a))]
+  when-some [b (fn-which-may-return-nil x),
+             c (fn-which-may-return-nil y)]
   when (seq x)
   do (println x)
   (odd? (+ x y)) 2
@@ -129,22 +141,23 @@ The only time you wouldn't want to use `defnc` is when you are taking advantage 
 
 I personally tend to write everything with `defnc` now, as it makes it easier to insert let bindings and conditional responses later.  `defnc` is implemented using the spec for Clojure's built-in `defn`, so it can handle all the same things: multiple arities, pre/post-map, metadata map, docstring, etc.
 
-In order to support multiple bindings in cond's :when-let clauses, better-cond.core also contains a version of `if-let` and `when-let` which can take multiple name-expression pairs in the binding vector (the ones built into Clojure can only take a single name and expression).  The test passes only when all the names evaluate to something truthy.  You may find it useful to use better-cond's `if-let` and `when-let` directly.
+In order to support multiple bindings in cond's :when-let and :when-some clauses, better-cond.core also contains a version of `if-let`, `if-some`, `when-let`, and `when-some` which can take multiple name-expression pairs in the binding vector (the ones built into Clojure can only take a single name and expression).  The test passes only when all the names evaluate to something truthy (or non-nil for if-some/when-some).  You may find it useful to use better-cond's `if-let`, `if-some`, `when-let`, and `when-some` directly.
 
-As with `cond`, if you use `if-let` or `when-let` you'll need to qualify with the namespace or namespace alias (i.e., `b/if-let` and `b/when-let`) or you'll need to exclude the Clojure version from your namespace:
+As with `cond`, if you use `if-let`, `if-some`, `when-let`, or `when-some` you'll need to qualify with the namespace or namespace alias (i.e., `b/if-let`, `b/when-let`, `b/when-some`) or you'll need to exclude the Clojure version from your namespace:
 
 ```clojure
     (ns example.core
-      (:refer-clojure :exclude [cond if-let when-let])
-      (:require [better-cond.core :refer [cond if-let when-let defnc defnc-]]))
+      (:refer-clojure :exclude [cond if-let if-some when-let when-some])
+      (:require [better-cond.core :refer [cond if-let if-some when-let when-some defnc defnc-]]))
 ```
 
 You could also `:refer :all` if you are on Clojure and not Clojurescript.  If you want the whole shebang, and you want to replace Clojure's defn with defnc, your namespace header would look like this:
 
 ```clojure
     (ns example.core
-      (:refer-clojure :exclude [cond if-let when-let defn defn-])
-      (:require [better-cond.core :refer [cond if-let when-let defnc defnc-] :rename {defnc defn, defnc- defn-}]))
+      (:refer-clojure :exclude [cond if-let if-some when-let when-some defn defn-])
+      (:require [better-cond.core :refer [cond if-let if-some when-let when-some defnc defnc-]
+	                              :rename {defnc defn, defnc- defn-}]))
 ```
 
 (As of the time of this writing, Cursive [does not have code completion or adjustable indenting for symbols that have been renamed from other namespaces](https://github.com/cursive-ide/cursive/issues/1544).)
@@ -152,6 +165,10 @@ You could also `:refer :all` if you are on Clojure and not Clojurescript.  If yo
 I use this library on a daily basis, and it is hugely useful in preventing the code from getting deeply nested, helping to make the code dramatically clearer.  Try it -- you'll be hooked.
 
 This is a feature that has been discussed since the early days of Clojure.  There was a [JIRA issue for this](http://dev.clojure.org/jira/browse/CLJ-200) for seven years.
+
+## Known Issue
+
+`defnc` and `defnc-` macros do not preserve type hint info on return value of function.  Type hints on function's arguments work fine.  See [https://dev.clojure.org/jira/browse/CLJ-2381](https://dev.clojure.org/jira/browse/CLJ-2381).
 
 ## Rationale
 
@@ -260,7 +277,7 @@ No, a lot of the time you can't name something until it exists, and knowing it e
 
 ### How do I remember the syntax?
 
-The syntax is inspired by the way that `:let` and `:when` work inside a for comprehension, extending the syntax to two new keywords: `:when-let` and `:do`.
+The syntax is inspired by the way that `:let` and `:when` work inside a for comprehension, extending the syntax to three new keywords: `:when-let`. `:when-some` and `:do`.
 
 ## License
 

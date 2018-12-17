@@ -2,13 +2,13 @@
   "A collection of variations on Clojure's core macros. Let's see which features
    end up being useful."
   {:author "Christophe Grand and Mark Engelberg"}
-  (:require-macros [better-cond.core :refer [cond when-let if-let defnc defnc-]])
+  (:require-macros [better-cond.core :refer [cond when-let if-let when-some if-some defnc defnc-]])
   (:require [clojure.spec.alpha :as spec])
-  (:refer-clojure :exclude [cond when-let if-let]))
+  (:refer-clojure :exclude [cond when-let if-let when-some if-some]))
 
 ;; This file is necessary until Clojurescript ports clojure.core.specs.alpha.
 ;; Once that port happens, the Clojure file, renamed as .cljc with
-;; #?(:cljs (:require-macros [better-cond.core :refer [cond when-let if-let defnc defnc-]]))
+;; #?(:cljs (:require-macros [better-cond.core :refer [cond when-let if-let when-some if-some defnc defnc-]]))
 ;; will suffice
 
 (defmacro if-let
@@ -34,6 +34,29 @@
   [bindings & body]
   `(if-let ~bindings (do ~@body)))
 
+(defmacro if-some
+  "A variation on if-some where all the exprs in the bindings vector must be non-nil.
+   Also supports :let."
+  ([bindings then]
+   `(if-some ~bindings ~then nil))
+  ([bindings then else]
+   (if (seq bindings)
+     (if (or (= :let (bindings 0)) (= 'let (bindings 0)))
+       `(let ~(bindings 1)
+          (if-some ~(subvec bindings 2) ~then ~else))
+       `(let [test# ~(bindings 1)]
+          (if (nil? test#)
+            ~else
+            (let [~(bindings 0) test#]
+              (if-some ~(subvec bindings 2) ~then ~else)))))
+     then)))
+
+(defmacro when-some
+  "A variation on when-some where all the exprs in the bindings vector must be non-nil.
+   Also supports :let."
+  [bindings & body]
+  `(if-some ~bindings (do ~@body)))
+
 (defmacro cond
   "A variation on cond which sports let bindings, do and implicit else:
      (cond 
@@ -42,21 +65,23 @@
        :let [a (quot a 2)]
        (odd? a) 2
        3).
-   Also supports :when-let. 
-   :let, :when-let and :do do not need to be written as keywords."
+   Also supports :when-let and :when-some. 
+   :let, :when-let, :when-some and :do do not need to be written as keywords."
   [& clauses]
   (when-let [[test expr & more-clauses] (seq clauses)]
-            (if (next clauses)
-              (if (or (= :do test) (= 'do test))
-                `(do ~expr (cond ~@more-clauses))
-                (if (or (= :let test) (= 'let test))
-                  `(let ~expr (cond ~@more-clauses))
-                  (if (or (= :when test) (= 'when test))
-                    `(when ~expr (cond ~@more-clauses))
-                    (if (or (= :when-let test) (= 'when-let test))
-                      `(when-let ~expr (cond ~@more-clauses))
-                      `(if ~test ~expr (cond ~@more-clauses))))))
-              test)))
+    (if (next clauses)
+      (if (or (= :do test) (= 'do test))
+        `(do ~expr (cond ~@more-clauses))
+        (if (or (= :let test) (= 'let test))
+          `(let ~expr (cond ~@more-clauses))
+          (if (or (= :when test) (= 'when test))
+            `(when ~expr (cond ~@more-clauses))
+            (if (or (= :when-let test) (= 'when-let test))
+              `(when-let ~expr (cond ~@more-clauses))
+              (if (or (= :when-some test) (= 'when-some test))
+                `(when-some ~expr (cond ~@more-clauses))
+                `(if ~test ~expr (cond ~@more-clauses)))))))
+      test)))
 
 (defmacro defnc "defn with implicit cond" [& defn-args]
   (cond
@@ -85,20 +110,19 @@
                                                                   (assoc-in conf [:bs 1 :bodies] new-bodies))))))
 
 
-(defn arg-list-unformer [a]
-  (vec 
-    (if (and (coll? (last a)) (= '& (first (last a))))
-      (concat (drop-last a) (last a))
-      a)))
-
-(spec/def ::local-name (spec/and simple-symbol? #(not= '& %)))
+(defn vec-unformer [a]
+  (into []
+        (mapcat (fn [x] (if (and (coll? x) (#{'& :as} (first x))) x [x])))
+        a))
+        
+(spec/def ::local-name (spec/and simple-symbol? #(not= '& %)))        
 
 (spec/def ::arg-list
   (spec/and
-    vector?
-    (spec/conformer vec arg-list-unformer)
-    (spec/cat :args (spec/* ::binding-form)
-              :varargs (spec/? (spec/cat :amp #{'&} :form ::binding-form)))))
+   vector?
+   (spec/conformer vec vec-unformer)
+   (spec/cat :args (spec/* ::binding-form)
+             :varargs (spec/? (spec/cat :amp #{'&} :form ::binding-form)))))
 
 (spec/def ::args+body
   (spec/cat :args ::arg-list
@@ -122,11 +146,11 @@
 
 (spec/def ::seq-binding-form
   (spec/and
-    vector?
-    (spec/conformer vec vec)
-    (spec/cat :elems (spec/* ::binding-form)
-              :rest (spec/? (spec/cat :amp #{'&} :form ::binding-form))
-              :as (spec/? (spec/cat :as #{:as} :sym ::local-name)))))
+   vector?
+   (spec/conformer vec vec-unformer)
+   (spec/cat :elems (spec/* ::binding-form)
+             :rest (spec/? (spec/cat :amp #{'&} :form ::binding-form))
+             :as (spec/? (spec/cat :as #{:as} :sym ::local-name)))))
 
 ;; Map destructuring
 
