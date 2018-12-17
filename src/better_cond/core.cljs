@@ -2,9 +2,14 @@
   "A collection of variations on Clojure's core macros. Let's see which features
    end up being useful."
   {:author "Christophe Grand and Mark Engelberg"}
-  (:require [clojure.core.specs.alpha]
-            [clojure.spec.alpha :as spec])
+  (:require-macros [better-cond.core :refer [cond when-let if-let when-some if-some defnc defnc-]])
+  (:require [clojure.spec.alpha :as spec])
   (:refer-clojure :exclude [cond when-let if-let when-some if-some]))
+
+;; This file is necessary until Clojurescript ports clojure.core.specs.alpha.
+;; Once that port happens, the Clojure file, renamed as .cljc with
+;; #?(:cljs (:require-macros [better-cond.core :refer [cond when-let if-let when-some if-some defnc defnc-]]))
+;; will suffice
 
 (defmacro if-let
   "A variation on if-let where all the exprs in the bindings vector must be true.
@@ -109,6 +114,8 @@
   (into []
         (mapcat (fn [x] (if (and (coll? x) (#{'& :as} (first x))) x [x])))
         a))
+        
+(spec/def ::local-name (spec/and simple-symbol? #(not= '& %)))        
 
 (spec/def ::arg-list
   (spec/and
@@ -131,9 +138,9 @@
                                              :attr (spec/? map?)))))
 
 (spec/def ::binding-form
-  (spec/or :sym :clojure.core.specs.alpha/local-name
+  (spec/or :sym ::local-name
            :seq ::seq-binding-form
-           :map :clojure.core.specs.alpha/map-binding-form))
+           :map ::map-binding-form))
 
 ;; sequential destructuring
 
@@ -143,12 +150,39 @@
    (spec/conformer vec vec-unformer)
    (spec/cat :elems (spec/* ::binding-form)
              :rest (spec/? (spec/cat :amp #{'&} :form ::binding-form))
-             :as (spec/? (spec/cat :as #{:as} :sym :clojure.core.specs.alpha/local-name)))))
+             :as (spec/? (spec/cat :as #{:as} :sym ::local-name)))))
+
+;; Map destructuring
+
+
+(spec/def ::keys (spec/coll-of ident? :kind vector?))
+(spec/def ::syms (spec/coll-of symbol? :kind vector?))
+(spec/def ::strs (spec/coll-of simple-symbol? :kind vector?))
+(spec/def ::or (spec/map-of simple-symbol? any?))
+(spec/def ::as ::local-name)
+
+(spec/def ::map-special-binding
+  (spec/keys :opt-un [::as ::or ::keys ::syms ::strs]))
+
+(spec/def ::map-binding (spec/tuple ::binding-form any?))
+
+(spec/def ::ns-keys
+  (spec/tuple
+   (spec/and qualified-keyword? #(-> % name #{"keys" "syms"}))
+   (spec/coll-of simple-symbol? :kind vector?)))
+
+(spec/def ::map-bindings
+  (spec/every (spec/or :mb ::map-binding
+                 :nsk ::ns-keys
+                 :msb (spec/tuple #{:as :or :keys :syms :strs} any?)) :into {}))
+
+(spec/def ::map-binding-form (spec/merge ::map-bindings ::map-special-binding))
+
 
 (spec/fdef defnc
            :args ::defn-args
            :ret any?)
-           
+
 (spec/fdef defnc-
            :args ::defn-args
            :ret any?)

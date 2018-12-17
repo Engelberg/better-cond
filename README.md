@@ -1,61 +1,174 @@
 # better-cond
 
-A variation on cond which sports let bindings, when-let bindings and implicit else.  The version for Clojure 1.8 and below is version 1.0.1.  If you are using Clojure 1.9, check out the new features in [version 2.0.0](https://github.com/Engelberg/better-cond/tree/v2.0.0) or [version 2.0.1](https://github.com/Engelberg/better-cond/tree/v2.0.1) for alpha16 or later.
+A variation on cond which sports let bindings, when-let bindings, when-some bindings, when, do and implicit else for Clojure and Clojurescript.
+
+*New in version 2.0.x:*
+
+- Cond supports `do` for a single-line side effect.
+- Cond supports `when-some` (like `when-let` but tests for non-nil).
+- Cond allows symbols as an alternative to keywords for let, when-let, when-some, when, and do.
+- Two new macros: `defnc` and `defnc-` are like `defn` and `defn-` with an implicit cond wrapped around the body.
+
+`better-cond 2.0.2` requires Clojure 1.9 alpha 16 or higher.  If you are still on Clojure 1.8, use `better-cond 1.0.1`.
 
 ## Usage
 
 Add the following line to your leiningen dependencies:
 
-    [better-cond "1.0.1"]
+    [better-cond "2.0.2"]
 
 Require better-cond in your namespace header:
 
 ```clojure
-     (ns example.core
-       (:require [better-cond.core :as b]))
+ (ns example.core
+   (:require [better-cond.core :as b]))
 
-     (b/cond
-       (odd? a) 1
-       :let [a (quot a 2)]
-       :when-let [x (fn-which-may-return-nil a),
-                  y (fn-which-may-return-nil (* 2 a))]
-       ; bails early with nil unless x and y are both truthy
-       (odd? (+ x y)) 2
-       3)
+ (b/cond
+   (odd? a) 1
+
+   :let [a (quot a 2)]
+   ; a has been rebound to the result of (quot a 2) for the remainder
+   ; of this cond.
+
+   :when-let [x (fn-which-may-return-falsey a),
+              y (fn-which-may-return-falsey (* 2 a))]
+   ; this when-let binds x and y for the remainder of the cond and
+   ; bails early with nil unless x and y are both truthy
+
+   :when-some [b (fn-which-may-return-nil x),
+   			   c (fn-which-may-return-nil y)]
+   ; this when-some binds b and c for the reaminder of the cond and
+   ; bails early with nil unless b and c are both not nil
+
+   :when (seq x)
+   ; the above when bails early with nil unless (seq x) is truthy
+   ; it could have been written as: (not (seq x)) nil
+
+   :do (println x)
+   ; A great way to put a side-effecting statement, like a println
+   ; into the middle of a cond
+
+   (odd? (+ x y)) 2
+
+   3)
+   ; This version of cond lets you have a single trailing element
+   ; which is treated as a final :else clause.
+   ; Stylistically, I recommend explicitly using :else unless
+   ; the previous line is a :let, :when-let, or :when-some clause, in which
+   ; case the implicit else tends to look more natural.
 ```
 
 or alternatively, use it:
 
 ```clojure
-     (ns example.core
-       (:refer-clojure :exclude [cond])
-       (:require [better-cond.core :refer [cond]]))
+ (ns example.core
+   (:refer-clojure :exclude [cond])
+   (:require [better-cond.core :refer [cond]]))
 
-     (cond
-       (odd? a) 1
-       :let [a (quot a 2)]
-       :when-let [x (fn-which-may-return-nil a),
-                  y (fn-which-may-return-nil (* 2 a))]
-       ; bails early with nil unless x and y are both truthy
-       (odd? (+ x y)) 2
-       3)
+ (cond
+   (odd? a) 1
+   :let [a (quot a 2)]
+   :when-let [x (fn-which-may-return-falsey a),
+              y (fn-which-may-return-falsey (* 2 a))]
+   :when-some [b (fn-which-may-return-nil x),
+               c (fn-which-may-return-nil y)]
+   :when (seq x)
+   :do (println x)
+   (odd? (+ x y)) 2
+   3)
 ```
 
-*Note: better-cond also works in Clojurescript; simply change `:require` to `:require-macros`.*
+In Clojurescript, it is best to use `:require-macros`:
 
-In order to support multiple bindings in cond's :when-let clauses, better-cond.core also contains a version of `if-let` and `when-let` which can take multiple name-expression pairs in the binding vector (the ones built into Clojure can only take a single name and expression).  The test passes only when all the names evaluate to something truthy.  You may find it useful to use better-cond's `if-let` and `when-let` directly.
+```clojure
+ (ns example.core
+   (:refer-clojure :exclude [cond])
+   (:require-macros [better-cond.core :refer [cond]]))
+```
 
-As with `cond`, if you use `if-let` or `when-let` you'll need to qualify with the namespace or namespace alias (i.e., `b/if-let` and `b/when-let`) or you'll need to exclude the Clojure version from your namespace:
+As of version 2.0.0, writing let, when-let, when-some, when, and do as keywords is optional.  So you can also write it like this, if you prefer:
+
+```clojure
+ (cond
+   (odd? a) 1
+   let [a (quot a 2)]
+   when-let [x (fn-which-may-return-falsey a),
+             y (fn-which-may-return-falsey (* 2 a))]
+   when-some [b (fn-which-may-return-nil x),
+              c (fn-which-may-return-nil y)]
+   when (seq x)
+   do (println x)
+   (odd? (+ x y)) 2
+   3)
+```
+
+The `defnc` and `defnc-` macros behave like Clojure's built-in `defn` and `defn-`, but they implicitly wrap the body of the function in `cond`, saving you another level of indenting.
+
+```clojure
+(defnc f [a]
+  (odd? a) 1
+  let [a (quot a 2)]
+  when-let [x (fn-which-may-return-falsey a),
+            y (fn-which-may-return-falsey (* 2 a))]
+  when-some [b (fn-which-may-return-nil x),
+             c (fn-which-may-return-nil y)]
+  when (seq x)
+  do (println x)
+  (odd? (+ x y)) 2
+  3)
+```
+
+Because this `cond` has an implicit else, you can use `defnc` for almost all functions you would have created with `defn`, even those that do not actually use cond.
+
+```clojure
+(defnc f [x] (* x 2)) ; This works as expected
+```
+
+The only time you wouldn't want to use `defnc` is when you are taking advantage of the implicit do offered by `defn`:
+
+```clojure
+(defn f [x]
+  (println x)
+  (* x 2))
+
+; The above makes use of defn's implicit do, but if desired,
+; could be rewritten with defnc as:
+
+(defnc f [x]
+  do (println x)
+  (* x 2))
+```
+
+I personally tend to write everything with `defnc` now, as it makes it easier to insert let bindings and conditional responses later.  `defnc` is implemented using the spec for Clojure's built-in `defn`, so it can handle all the same things: multiple arities, pre/post-map, metadata map, docstring, etc.
+
+In order to support multiple bindings in cond's :when-let and :when-some clauses, better-cond.core also contains a version of `if-let`, `if-some`, `when-let`, and `when-some` which can take multiple name-expression pairs in the binding vector (the ones built into Clojure can only take a single name and expression).  The test passes only when all the names evaluate to something truthy (or non-nil for if-some/when-some).  You may find it useful to use better-cond's `if-let`, `if-some`, `when-let`, and `when-some` directly.
+
+As with `cond`, if you use `if-let`, `if-some`, `when-let`, or `when-some` you'll need to qualify with the namespace or namespace alias (i.e., `b/if-let`, `b/when-let`, `b/when-some`) or you'll need to exclude the Clojure version from your namespace:
 
 ```clojure
     (ns example.core
-      (:refer-clojure :exclude [cond if-let when-let])
-      (:require [better-cond.core :refer [cond if-let when-let]]))
+      (:refer-clojure :exclude [cond if-let if-some when-let when-some])
+      (:require [better-cond.core :refer [cond if-let if-some when-let when-some defnc defnc-]]))
 ```
 
-The aspect of the library I use the most is the :let binding inside of the cond.  I use this on a daily basis, and it is hugely useful in preventing the code from getting deeply nested and helps make the code dramatically clearer.  Try it -- you'll be hooked.
+You could also `:refer :all` if you are on Clojure and not Clojurescript.  If you want the whole shebang, and you want to replace Clojure's defn with defnc, your namespace header would look like this:
 
-There has been a [JIRA issue for this](http://dev.clojure.org/jira/browse/CLJ-200) for several years, so hopefully this will make it into Clojure proper at some point.  Please go vote for it.
+```clojure
+    (ns example.core
+      (:refer-clojure :exclude [cond if-let if-some when-let when-some defn defn-])
+      (:require [better-cond.core :refer [cond if-let if-some when-let when-some defnc defnc-]
+	                              :rename {defnc defn, defnc- defn-}]))
+```
+
+(As of the time of this writing, Cursive [does not have code completion or adjustable indenting for symbols that have been renamed from other namespaces](https://github.com/cursive-ide/cursive/issues/1544).)
+
+I use this library on a daily basis, and it is hugely useful in preventing the code from getting deeply nested, helping to make the code dramatically clearer.  Try it -- you'll be hooked.
+
+This is a feature that has been discussed since the early days of Clojure.  There was a [JIRA issue for this](http://dev.clojure.org/jira/browse/CLJ-200) for seven years.
+
+## Known Issue
+
+`defnc` and `defnc-` macros do not preserve type hint info on return value of function.  Type hints on function's arguments work fine.  See [https://dev.clojure.org/jira/browse/CLJ-2381](https://dev.clojure.org/jira/browse/CLJ-2381).
 
 ## Rationale
 
@@ -111,7 +224,7 @@ Many Clojure programmers use the println debugging method when trying to underst
 ```clojure
 (cond
   ... some other test/expressions
-  :let [_ (println (:name (:pet customer)))]
+  :do (println (:name (:pet customer)))
   (> (count (:name (:pet customer))) 20) (need-bigger-plaque)
   ... tests continue
 ```
@@ -123,18 +236,17 @@ There is tremendous value in being able to drop a print statement into the middl
 I have gotten so used to the power of better-cond to minimize rightward drift, that sometimes I even use it to help the aesthetics of a function that has little to do with cond.  For example:
 
 ```clojure
-(defn solutions-general [clauses]
-  (cond
-    :let [[object->int int->object] (build-transforms clauses)
-          transformed-clauses (mapv (clause-transformer object->int) clauses)]
-    :when-let [solver (create-solver transformed-clauses)]
-    :let [timeout (.getTimeoutMs solver)]
-    :when-let [solution (.findModel solver timeout)]
-    :let [untransformed-solution ((clause-transformer int->object) solution)]
-    (vec untransformed-solution)))
+(defnc solutions-general [clauses]
+  :let [[object->int int->object] (build-transforms clauses)
+       transformed-clauses (mapv (clause-transformer object->int) clauses)]
+  :when-let [solver (create-solver transformed-clauses)]
+  :let [timeout (.getTimeoutMs solver)]
+  :when-let [solution (.findModel solver timeout)]
+  :let [untransformed-solution ((clause-transformer int->object) solution)]
+  (vec untransformed-solution)))
 ```
 
-*Note: In the above example, I've taken advantage of the optional implicit else on the last line of better-cond, which feels especially natural when the second-to-last line is a :let or :when-let.*
+*Note: In the above example, I've taken advantage of the optional implicit else on the last line of better-cond, which feels especially natural when the second-to-last line is a :let or :when-let.  And remember, you can omit the colons in front of :let and :when=let if you prefer the aesthetics.*
 
 Compare with:
 
@@ -159,23 +271,13 @@ The introduction of cond->, as->, and some-> addressed some of the pain points o
 
 If you are a big fan of threading macros, take a look at [https://github.com/maitria/packthread](https://github.com/maitria/packthread) which addresses some of the same issues in that context.
 
-### Can't you just put all the name bindings at the top of your code?
+### Can't you just put all the name bindings at the top, before your cond?
 
 No, a lot of the time you can't name something until it exists, and knowing it exists is predicated on making other tests.  For example, you can't meaningfully start talking about the first and rest of a sequence until you know that the sequence is not empty, or that the thing even is a sequence.
 
-### How will I remember the syntax?
+### How do I remember the syntax?
 
-It's just like the way :let clauses work within a `for` comprehension.
-
-### Since this exists as a library, there's no reason for Clojure to include it, right?
-
-Well, certainly one of the beautiful things about Lisp languages is that you can code up your own control constructs and use them whether they are officially part of the language or not.  I've been happily using this version of `cond` in my own code for several years.
-
-But there is a social aspect to programming as well. When working as part of a company or as part of the open-source community, there's value to sticking with the standard set of control constructs.  It can be confusing to read someone else's code littered with constructs you don't recognize, or constructs which look like a built-in construct but have special features.  So, certainly I am still hopeful that one day we'll see inclusion of this feature in Clojure.  Although I was not the person who originally proposed  this feature for Clojure, I think it adds a lot of value so I took an active role in helping maintain the patch for the feature request over the years.
-
-For the purposes of the JIRA patch, I've advocated using only the most conservative extension to cond as I think that would be the most realistic proposal for widespread use and would deliver the most "bang for the buck" (i.e.,  just adding the :let clause, no :when-let and no implicit else clause).
-
-**UPDATE** *The day after the better-cond library was announced, the [JIRA issue](http://dev.clojure.org/jira/browse/CLJ-200) for this enhancement, which had been open for 7 years, was declined, turning off the ability to vote for the feature.  No comment or explanation for declining the patch was provided.*
+The syntax is inspired by the way that `:let` and `:when` work inside a for comprehension, extending the syntax to three new keywords: `:when-let`. `:when-some` and `:do`.
 
 ## License
 
