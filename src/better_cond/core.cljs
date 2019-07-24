@@ -87,11 +87,19 @@
   (cond
     let [conf (spec/conform ::defn-args defn-args),
          bs (:bs conf)]
-    (= (key bs) :arity-1) (cons 'clojure.core/defn (spec/unform ::defn-args
-                                                                (update-in conf [:bs 1 :body] #(list (cons 'better-cond.core/cond %)))))
+    (= (key bs) :arity-1) (let [body-location (if (= (get-in conf [:bs 1 :body 0]) :prepost+body)
+                                                [:bs 1 :body 1 :body]
+                                                [:bs 1 :body 1])]
+                            (cons 'clojure.core/defn
+                                  (spec/unform ::defn-args
+                                               (update-in conf body-location #(list (cons 'better-cond.core/cond %))))))
     (= (key bs) :arity-n) (let [bodies (:bodies (val (conf :bs))),
                                 new-bodies
-                                (mapv (fn [body] (update body :body #(list (cons 'better-cond.core/cond %))))
+                                (mapv (fn [body]
+                                        (let [body-location (if (= (get-in body [:body 0]) :prepost+body)
+                                                              [:body 1 :body]
+                                                              [:body 1])]
+                                          (update-in body body-location #(list (cons 'better-cond.core/cond %)))))
                                       bodies)]
                             (cons 'clojure.core/defn (spec/unform ::defn-args
                                                                   (assoc-in conf [:bs 1 :bodies] new-bodies))))))
@@ -100,15 +108,22 @@
   (cond
     let [conf (spec/conform ::defn-args defn-args),
          bs (:bs conf)]
-    (= (key bs) :arity-1) (cons 'clojure.core/defn (spec/unform ::defn-args
-                                                                (update-in conf [:bs 1 :body] #(list (cons 'better-cond.core/cond %)))))
+    (= (key bs) :arity-1) (let [body-location (if (= (get-in conf [:bs 1 :body 0]) :prepost+body)
+                                                [:bs 1 :body 1 :body]
+                                                [:bs 1 :body 1])]
+                            (cons 'clojure.core/defn-
+                                  (spec/unform ::defn-args
+                                               (update-in conf body-location #(list (cons 'better-cond.core/cond %))))))
     (= (key bs) :arity-n) (let [bodies (:bodies (val (conf :bs))),
                                 new-bodies
-                                (mapv (fn [body] (update body :body #(list (cons 'better-cond.core/cond %))))
+                                (mapv (fn [body]
+                                        (let [body-location (if (= (get-in body [:body 0]) :prepost+body)
+                                                              [:body 1 :body]
+                                                              [:body 1])]
+                                          (update-in body body-location #(list (cons 'better-cond.core/cond %)))))
                                       bodies)]
-                            (cons 'clojure.core/defn (spec/unform ::defn-args
-                                                                  (assoc-in conf [:bs 1 :bodies] new-bodies))))))
-
+                            (cons 'clojure.core/defn- (spec/unform ::defn-args
+                                                                   (assoc-in conf [:bs 1 :bodies] new-bodies))))))
 
 (defn vec-unformer [a]
   (into []
@@ -126,8 +141,9 @@
 
 (spec/def ::args+body
   (spec/cat :args ::arg-list
-            :prepost (spec/? map?)
-            :body (spec/* any?)))
+            :body (spec/alt :prepost+body (spec/cat :prepost map?
+                                                    :body (spec/+ any?))
+                            :body (spec/* any?))))
 
 (spec/def ::defn-args
   (spec/cat :name simple-symbol?

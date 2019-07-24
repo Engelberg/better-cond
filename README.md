@@ -2,20 +2,20 @@
 
 A variation on cond which sports let bindings, when-let bindings, when-some bindings, when, do and implicit else for Clojure and Clojurescript.
 
-*New in version 2.0.x:*
+*New in version 2.0 and above:*
 
 - Cond supports `do` for a single-line side effect.
 - Cond supports `when-some` (like `when-let` but tests for non-nil).
 - Cond allows symbols as an alternative to keywords for let, when-let, when-some, when, and do.
 - Two new macros: `defnc` and `defnc-` are like `defn` and `defn-` with an implicit cond wrapped around the body.
 
-`better-cond 2.0.2` requires Clojure 1.9 alpha 16 or higher.  If you are still on Clojure 1.8, use `better-cond 1.0.1`.
+`better-cond 2.1.0` requires Clojure 1.9 alpha 16 or higher.  If you are still on Clojure 1.8, use `better-cond 1.0.1`.
 
 ## Usage
 
 Add the following line to your leiningen dependencies:
 
-    [better-cond "2.0.2"]
+    [better-cond "2.1.0"]
 
 Require better-cond in your namespace header:
 
@@ -102,6 +102,8 @@ As of version 2.0.0, writing let, when-let, when-some, when, and do as keywords 
    3)
 ```
 
+After trying it both ways in my code, I've come to prefer writing them as keywords, but both forms will continue to be supported.
+
 The `defnc` and `defnc-` macros behave like Clojure's built-in `defn` and `defn-`, but they implicitly wrap the body of the function in `cond`, saving you another level of indenting.
 
 ```clojure
@@ -168,7 +170,7 @@ This is a feature that has been discussed since the early days of Clojure.  Ther
 
 ## Known Issue
 
-`defnc` and `defnc-` macros do not preserve type hint info on return value of function.  Type hints on function's arguments work fine.  See [https://dev.clojure.org/jira/browse/CLJ-2381](https://dev.clojure.org/jira/browse/CLJ-2381).
+`defnc` and `defnc-` macros do not preserve primitive type hint info on return value of function.  Type hints on function's arguments work fine.  See [https://dev.clojure.org/jira/browse/CLJ-2381](https://dev.clojure.org/jira/browse/CLJ-2381). Until this issue is resolved, don't use `defnc` or `defnc-` when you need a primitive return type. It works fine on primitive inputs, just not the return value.
 
 ## Rationale
 
