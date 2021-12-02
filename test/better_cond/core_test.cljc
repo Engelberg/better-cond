@@ -1,7 +1,7 @@
 (ns better-cond.core-test
   (:refer-clojure :exclude [cond if-let when-let if-some when-some])
-  (:require [clojure.test :refer :all]
-            [better-cond.core :refer :all]))
+  (:require [better-cond.core :refer [cond]]
+            [clojure.test :refer [deftest are]]))
 
 (deftest better-cond
   (are [x y] (= x y)
