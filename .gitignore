@@ -1,6 +1,5 @@
 /target
 /bin
-/resources
 .project
 /classes
 /checkouts
@@ -13,3 +12,4 @@ pom.xml.asc
 /.nrepl-port
 /.idea
 *.iml
+/.clj-kondo/.cache
