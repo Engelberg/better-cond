@@ -36,8 +36,8 @@ Require better-cond in your namespace header:
    ; bails early with nil unless x and y are both truthy
 
    :when-some [b (fn-which-may-return-nil x),
-   			   c (fn-which-may-return-nil y)]
-   ; this when-some binds b and c for the reaminder of the cond and
+     	       c (fn-which-may-return-nil y)]
+   ; this when-some binds b and c for the remainder of the cond and
    ; bails early with nil unless b and c are both not nil
 
    :when (seq x)
@@ -240,7 +240,7 @@ I have gotten so used to the power of better-cond to minimize rightward drift, t
 ```clojure
 (defnc solutions-general [clauses]
   :let [[object->int int->object] (build-transforms clauses)
-       transformed-clauses (mapv (clause-transformer object->int) clauses)]
+        transformed-clauses (mapv (clause-transformer object->int) clauses)]
   :when-let [solver (create-solver transformed-clauses)]
   :let [timeout (.getTimeoutMs solver)]
   :when-let [solution (.findModel solver timeout)]
@@ -248,7 +248,7 @@ I have gotten so used to the power of better-cond to minimize rightward drift, t
   (vec untransformed-solution)))
 ```
 
-*Note: In the above example, I've taken advantage of the optional implicit else on the last line of better-cond, which feels especially natural when the second-to-last line is a :let or :when-let.  And remember, you can omit the colons in front of :let and :when=let if you prefer the aesthetics.*
+*Note: In the above example, I've taken advantage of the optional implicit else on the last line of better-cond, which feels especially natural when the second-to-last line is a :let or :when-let.  And remember, you can omit the colons in front of :let and :when-let if you prefer the aesthetics.*
 
 Compare with:
 
