@@ -1,5 +1,11 @@
 # better-cond Change Log
 
+## 2.1.1
+
+### Enhancements
+
+* Added support for clj-kondo, using pull request submitted by `borkdude`.
+
 ## 2.1.0
 
 ### Bugfixes

@@ -9,13 +9,13 @@ A variation on cond which sports let bindings, when-let bindings, when-some bind
 - Cond allows symbols as an alternative to keywords for let, when-let, when-some, when, and do.
 - Two new macros: `defnc` and `defnc-` are like `defn` and `defn-` with an implicit cond wrapped around the body.
 
-`better-cond 2.1.0` requires Clojure 1.9 alpha 16 or higher.  If you are still on Clojure 1.8, use `better-cond 1.0.1`.
+`better-cond 2.1.1` requires Clojure 1.9 alpha 16 or higher.  If you are still on Clojure 1.8, use `better-cond 1.0.1`.
 
 ## Usage
 
 Add the following line to your leiningen dependencies:
 
-    [better-cond "2.1.0"]
+    [better-cond "2.1.1"]
 
 Require better-cond in your namespace header:
 
