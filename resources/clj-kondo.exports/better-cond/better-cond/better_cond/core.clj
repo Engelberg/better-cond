@@ -83,7 +83,7 @@
           , (recur pairs (conj new-body lhs rhs))))
       (api/list-node new-body))))
 
-(def cond
+(def cond-hook
   (fn [{:keys [:node]}]
     (let [expr (let [args (rest (:children node))
                      pairs (partition-all 2 args)]
