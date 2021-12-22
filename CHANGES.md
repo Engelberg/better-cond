@@ -1,5 +1,11 @@
 # better-cond Change Log
 
+## 2.1.2
+
+### Bugfixes
+
+* Renamed clj-kondo hooks for better experience with Cursive IDE.
+
 ## 2.1.1
 
 ### Enhancements

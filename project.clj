@@ -1,4 +1,4 @@
-(defproject better-cond "2.1.1"
+(defproject better-cond "2.1.2"
   :description "A better cond"
   :url "http://github.com/Engelberg/better-cond"
   :license {:name "Eclipse Public License"
