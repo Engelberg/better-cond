@@ -1,5 +1,5 @@
 {:hooks
- {:analyze-call {better-cond.core/cond better-cond.core/cond}}
+ {:analyze-call {better-cond.core/cond better-cond.core/cond-hook}}
  :lint-as
  {better-cond.core/if-let clojure.core/let
   better-cond.core/when-let clojure.core/when-let}}
