@@ -1,5 +1,11 @@
 # better-cond Change Log
 
+## 2.1.3
+
+### Bugfixes
+
+* Fix when-let in clj-kondo hooks
+
 ## 2.1.2
 
 ### Bugfixes
