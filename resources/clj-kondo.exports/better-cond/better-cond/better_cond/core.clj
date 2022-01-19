@@ -18,7 +18,8 @@
   be done if needed."
   (:refer-clojure :exclude [cond])
   (:require
-   [clj-kondo.hooks-api :as api]))
+   [clj-kondo.hooks-api :as api]
+   [clojure.string :as str]))
 
 (def better-cond-simple-keys
   "Special constructs in better cond, either as keywords or symbols.
@@ -90,3 +91,17 @@
                  (process-pairs pairs))]
       {:node (with-meta expr
                (meta node))})))
+
+(defn defnc-hook [{:keys [node]}]
+  (let [[defnc-node name-node arg-node & body]
+        (:children node)
+        new-node (api/list-node [(api/token-node (if (str/ends-with? (str defnc-node)
+                                                                     "defnc-")
+                                                   'clojure.core/defn-
+                                                   'clojure.core/defn))
+                                 name-node
+                                 arg-node
+                                 (api/list-node
+                                  (list* (api/token-node 'better-cond.core/cond)
+                                         body))])]
+    {:node new-node}))

@@ -1,0 +1,37 @@
+name: ci
+
+on: [push, pull_request]
+
+jobs:
+
+  ci:
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Prepare java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '8'
+
+      - name: Install clojure tools
+        uses: DeLaGuardo/setup-clojure@3.7
+        with:
+          cli: 1.10.3.1058
+
+      - name: clojure test
+        run: clojure -M:test:clj-test
+
+      - name: clojurescript test
+        run: clojure -M:test:cljs-test
+
+      - name: clj-kondo test
+        run: clojure -M:test:clj-kondo-test
