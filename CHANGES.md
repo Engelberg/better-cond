@@ -1,5 +1,12 @@
 # better-cond Change Log
 
+## 2.1.4
+
+### Improvements
+
+* Pull request from `borkdude` which added clj-kondo hooks to also properly lint defnc, defnc-, if-let, if-some, when-some
+* ...and added CI setup.
+
 ## 2.1.3
 
 ### Bugfixes
