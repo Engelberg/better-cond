@@ -58,4 +58,16 @@
     nil (when-let [x true, y nil] [x y])
     true (if-let [x true _y true] x 3)
     3 (if-let [x false [_y] [1]] x 3)
-    false (if-some [x false {_y :y} {:y 1}] x 3)))
+    false (if-some [x false {_y :y} {:y 1}] x 3)
+    16 (if-let [x 12
+                :let [y (+ x 4)]]
+         y 17)
+    16 (when-let [x 12
+                  :let [y (+ x 4)]]
+         y)
+    16 (if-some [x 12
+                 :let [y (+ x 4)]]
+         y)
+    16 (when-some [x 12
+                   :let [y (+ x 4)]]
+         y)))

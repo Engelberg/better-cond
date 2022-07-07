@@ -84,13 +84,51 @@
           , (recur pairs (conj new-body lhs rhs))))
       (api/list-node new-body))))
 
-(def cond-hook
-  (fn [{:keys [:node]}]
-    (let [expr (let [args (rest (:children node))
-                     pairs (partition-all 2 args)]
-                 (process-pairs pairs))]
-      {:node (with-meta expr
-               (meta node))})))
+(defn cond-hook
+  [{:keys [node]}]
+  (let [expr (let [args (rest (:children node))
+                   pairs (partition-all 2 args)]
+               (process-pairs pairs))]
+    {:node (with-meta expr
+             (meta node))}))
+
+(defn process-if-let-pairs [pairs then else]
+  (if (seq pairs)
+    (let [[lhs rhs] (first pairs)]
+      (if (and (api/keyword-node? lhs)
+               (= :let (api/sexpr lhs)))
+        (api/list-node (conj [(api/token-node 'clojure.core/let) rhs
+                              (process-if-let-pairs (next pairs) then else)]))
+        (let [test (api/token-node (gensym "test"))]
+          (api/list-node
+           (conj [(api/token-node 'clojure.core/let) (api/vector-node [test rhs])
+                  (api/list-node [(api/token-node 'if) test
+                                  (api/list-node
+                                   [(api/token-node 'clojure.core/let)
+                                    (api/vector-node [lhs test])
+                                    (process-if-let-pairs (next pairs) then else)])
+                                  else])])))))
+    then))
+
+(defn if-let-hook
+  [{:keys [node]}]
+  (let [expr (let [[binding-vec then else] (rest (:children node))
+                   pairs (partition-all 2 (:children binding-vec))
+                   node (process-if-let-pairs pairs then else)]
+               node)]
+    {:node (with-meta expr
+             (meta node))}))
+
+(defn when-let-hook
+  [{:keys [node]}]
+  (let [expr (let [[binding-vec & body] (rest (:children node))]
+               (api/list-node
+                [(api/token-node 'better-cond.core/if-let)
+                 binding-vec
+                 (api/list-node (list* (api/token-node 'do)
+                                       body))]))]
+    {:node (with-meta expr
+             (meta node))}))
 
 (defn defnc-hook [{:keys [node]}]
   (let [[defnc-node name-node arg-node & body]
