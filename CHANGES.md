@@ -1,5 +1,11 @@
 # better-cond Change Log
 
+## 2.1.5
+
+### Improvements
+
+* Pull Request from `borkdude` which added clj-kondo hooks to lint `:let` in `if-let`, `when-let`, `if-some`, and `when-some`.
+
 ## 2.1.4
 
 ### Improvements
